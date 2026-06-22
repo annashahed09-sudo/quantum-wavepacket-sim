@@ -3,20 +3,23 @@ import matplotlib.pyplot as plt
 
 from core.wavefunction import gaussian_wavepacket
 from core.potentials import square_barrier
-from solvers.split_operator import evolve
+from solvers.split_operator import evolve, precompute_k
 
 # -----------------------
-# Simulation parameters
+# Grid
 # -----------------------
 N = 1024
 x = np.linspace(-50, 50, N)
 dx = x[1] - x[0]
 
+# -----------------------
+# Time params
+# -----------------------
 dt = 0.01
 steps = 300
 
 # -----------------------
-# Initial wavefunction
+# Initial state
 # -----------------------
 psi = gaussian_wavepacket(x, x0=-15, k0=6, sigma=1.5)
 
@@ -26,15 +29,20 @@ psi = gaussian_wavepacket(x, x0=-15, k0=6, sigma=1.5)
 V = square_barrier(x, height=1.0, width=3.0, center=0.0)
 
 # -----------------------
-# Visualization setup
+# Precompute momentum grid (IMPORTANT optimization)
+# -----------------------
+k = precompute_k(N, dx)
+
+# -----------------------
+# Plot setup
 # -----------------------
 plt.ion()
 
 # -----------------------
-# Time evolution loop
+# Time evolution
 # -----------------------
 for t in range(steps):
-    psi = evolve(psi, V, x, dt)
+    psi = evolve(psi, V, x, dt, k=k)
 
     if t % 5 == 0:
         plt.clf()
