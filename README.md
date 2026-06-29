@@ -75,12 +75,3 @@ src/
 │   ├── split_operator.py
 │
 ├── main.py
-
-Instal dependencies 
-pip install numpy scipy matplotlib
-
-Run simulations
-python src/main.py
-
-License
-MIT License
