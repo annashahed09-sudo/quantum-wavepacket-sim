@@ -1,0 +1,30 @@
+name: Scheduled Contribution Workflow
+
+on:
+  schedule:
+    # Runs exactly 12 times a day at specific UTC hours: 00:00, 05:00, 10:00, 15:00, 20:00
+    - cron: '0 0,10,11,12,13,14,16,15,17,19,21 * * * '
+  workflow_dispatch: # Allows you to manually trigger the workflow from the Actions tab
+
+jobs:
+  make-contribution:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Crucial permission to allow pushing code back to the repo
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Generate Structured Update
+      run: |
+        # Creates or appends to a log file to guarantee there is a change to commit
+        echo "Activity log entry: $(date -u)" >> contribution_log.txt
+
+    - name: Commit and Push Changes
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "automated: structured repository update"
+        file_pattern: 'contribution_log.txt'
+        commit_user_name: 'github-actions[bot]'
+        commit_user_email: '41898282+github-actions[bot]@://github.com'
