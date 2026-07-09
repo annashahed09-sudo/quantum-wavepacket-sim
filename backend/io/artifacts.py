@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+from uuid import UUID
 from pathlib import Path
 from typing import Any
 
@@ -12,21 +13,34 @@ import numpy as np
 ARTIFACT_ROOT = Path("backend/io/artifacts")
 
 
-def ensure_run_dir(run_id: str) -> Path:
-    run_dir = ARTIFACT_ROOT / run_id
+def _validate_under_root(path: Path) -> Path:
+    root_resolved = ARTIFACT_ROOT.resolve()
+    if root_resolved not in path.parents and path != root_resolved:
+        raise ValueError("invalid artifact path")
+    return path
+
+
+def ensure_run_dir_from_id(run_id: str) -> Path:
+    run_uuid = UUID(run_id)
+    run_dir = _validate_under_root((ARTIFACT_ROOT / run_uuid.hex).resolve())
+    run_dir.mkdir(parents=True, exist_ok=True)
+    return run_dir
+
+
+def resolve_run_dir_from_frames_path(frames_path: str) -> Path:
+    run_dir = _validate_under_root(Path(frames_path).resolve().parent)
     run_dir.mkdir(parents=True, exist_ok=True)
     return run_dir
 
 
 def save_frames_json(run_id: str, frames: list[dict[str, Any]]) -> Path:
-    run_dir = ensure_run_dir(run_id)
+    run_dir = ensure_run_dir_from_id(run_id)
     output = run_dir / "frames.json"
     output.write_text(json.dumps(frames))
     return output
 
 
-def export_csv(run_id: str, frames: list[dict[str, Any]]) -> Path:
-    run_dir = ensure_run_dir(run_id)
+def export_csv(run_dir: Path, frames: list[dict[str, Any]]) -> Path:
     output = run_dir / "diagnostics.csv"
     with output.open("w", newline="") as f:
         writer = csv.DictWriter(
@@ -50,16 +64,14 @@ def export_csv(run_id: str, frames: list[dict[str, Any]]) -> Path:
     return output
 
 
-def export_npy(run_id: str, frames: list[dict[str, Any]]) -> Path:
-    run_dir = ensure_run_dir(run_id)
+def export_npy(run_dir: Path, frames: list[dict[str, Any]]) -> Path:
     output = run_dir / "probability_density.npy"
     density = np.array([frame["probability_density"] for frame in frames])
     np.save(output, density)
     return output
 
 
-def export_hdf5(run_id: str, frames: list[dict[str, Any]]) -> Path:
-    run_dir = ensure_run_dir(run_id)
+def export_hdf5(run_dir: Path, frames: list[dict[str, Any]]) -> Path:
     output = run_dir / "simulation.h5"
     density = np.array([frame["probability_density"] for frame in frames])
     phase = np.array([frame["phase"] for frame in frames])

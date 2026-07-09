@@ -64,6 +64,7 @@ class JobManager:
             "status": row["status"],
             "summary": json.loads(row["summary_json"]) if row["summary_json"] else None,
             "frames": None,
+            "frames_path": row["frames_path"],
         }
 
         if row.get("frames_path"):

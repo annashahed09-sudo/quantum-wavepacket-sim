@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 
 from backend.api.schemas import CompareRequest, CreateSimulationRequest, ExportRequest, RunSimulationRequest
 from backend.core.config import SimulationConfig
-from backend.io.artifacts import compare_runs, export_csv, export_hdf5, export_npy
+from backend.io.artifacts import compare_runs, export_csv, export_hdf5, export_npy, resolve_run_dir_from_frames_path
 from backend.jobs.manager import job_manager
 from backend.solvers.split_operator import SplitOperatorSolver
 
@@ -77,19 +75,22 @@ async def export(request: ExportRequest):
     if not results:
         raise HTTPException(status_code=404, detail="run not found")
     frames = results.get("frames")
-    if not frames:
+    if not results.get("frames"):
         raise HTTPException(status_code=400, detail="no frames available")
+    if not results.get("frames_path"):
+        raise HTTPException(status_code=400, detail="frame artifact path unavailable")
+    run_dir = resolve_run_dir_from_frames_path(results["frames_path"])
 
     outputs: dict[str, str] = {}
     for fmt in request.formats:
         if fmt == "csv":
-            outputs[fmt] = str(export_csv(request.run_id, frames))
+            outputs[fmt] = str(export_csv(run_dir, frames))
         elif fmt == "npy":
-            outputs[fmt] = str(export_npy(request.run_id, frames))
+            outputs[fmt] = str(export_npy(run_dir, frames))
         elif fmt == "hdf5":
-            outputs[fmt] = str(export_hdf5(request.run_id, frames))
+            outputs[fmt] = str(export_hdf5(run_dir, frames))
         elif fmt == "json":
-            path = Path(f"backend/io/artifacts/{request.run_id}/frames.json")
+            path = run_dir / "frames.json"
             outputs[fmt] = str(path)
         else:
             raise HTTPException(status_code=400, detail=f"unsupported export format: {fmt}")
