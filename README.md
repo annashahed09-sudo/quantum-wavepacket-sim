@@ -1,77 +1,78 @@
-# Quantum Wave Packet Simulator (TDSE Engine)
+# Quantum Dynamics Platform
 
-GPU-ready numerical solver for the Time-Dependent Schrödinger Equation using spectral methods to simulate quantum wave packet dynamics, tunneling, and scattering in one spatial dimension.
+Production-oriented computational platform for solving the 1D time-dependent Schrödinger equation (TDSE) with a split-operator Fourier solver, API-first execution, and interactive web visualization.
 
----
+## Implemented Foundation
 
-## Overview
+- Typed simulation configuration and validation (Pydantic)
+- Split-operator solver with backend abstraction (NumPy, optional CuPy/PyFFTW)
+- Diagnostics: norm, norm error, expectation values, kinetic/potential/total energy
+- Async simulation job orchestration and lifecycle tracking
+- SQLite persistence for simulation runs
+- FastAPI endpoints and `/live` WebSocket streaming
+- Artifact export to JSON, CSV, NPY, and HDF5
+- Run comparison utilities
+- Next.js frontend scaffold with landing page and dashboard
+- CI workflow and Docker/Compose deployment scaffolding
 
-This project is a computational physics framework for solving the Time-Dependent Schrödinger Equation (TDSE). It simulates the evolution of quantum wave packets under external potentials, enabling visualization and analysis of tunneling, scattering, interference, and dispersion phenomena.
-
-The design is structured to evolve from a CPU-based numerical prototype into a GPU-accelerated and eventually multi-GPU distributed simulation system.
-
----
-
-## Key Computational Insight
-
-The dominant computational cost arises from FFT-based kinetic propagation in spectral space. This makes the solver memory-bandwidth bound and highly suitable for GPU acceleration using parallel FFT implementations.
-
----
-
-## Governing Equation
-
-The system solves the Time-Dependent Schrödinger Equation:
-
-iħ ∂ψ(x,t)/∂t = [−(ħ² / 2m) ∇² + V(x)] ψ(x,t)
-
-Where:
-- ψ(x,t): complex wavefunction
-- V(x): potential energy function
-- ħ: reduced Planck constant
-
-Observable quantity:
-- |ψ(x,t)|² → probability density
-
----
-
-## Numerical Method
-
-### Split-Operator Fourier Method
-
-The time evolution operator is approximated as:
-
-U(Δt) ≈ e^(−iVΔt/2ħ) · e^(−iTΔt/ħ) · e^(−iVΔt/2ħ)
-
-Where:
-- T is the kinetic energy operator
-- FFT is used to evaluate kinetic propagation in momentum space
-
-Properties:
-- Second-order accuracy in time
-- Approximately unitary (norm-preserving up to numerical precision)
-- Highly parallelizable and GPU-friendly
-
----
-
-## Physical Phenomena Simulated
-
-- Quantum tunneling through potential barriers
-- Wave packet scattering and reflection
-- Free particle dispersion
-- Quantum interference effects
-- Probability conservation dynamics
-
----
-
-## Project Architecture
+## Repository Layout
 
 ```text
-src/
-├── core/
-│   ├── wavefunction.py
-│   ├── potentials.py
-│
-├── solvers/
-│   ├── split_operator.py
-│
-├── main.py
+backend/
+  api/
+  core/
+  physics/
+  solvers/
+  fft/
+  analysis/
+  io/
+  database/
+  jobs/
+frontend/
+  src/components/
+  src/pages/
+  src/services/
+tests/
+docs/
+docker/
+```
+
+## API Endpoints
+
+- `POST /simulation/create`
+- `POST /simulation/run`
+- `GET /simulation/status/{run_id}`
+- `GET /simulation/results/{run_id}`
+- `GET /simulation/history`
+- `DELETE /simulation/{run_id}`
+- `POST /simulation/compare`
+- `POST /export`
+- `GET /gpu`
+- `GET /performance`
+- `WS /live`
+
+## Backend Quick Start
+
+```bash
+pip install -r requirements.txt
+uvicorn backend.main:app --reload
+```
+
+## Frontend Quick Start
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## Tests
+
+```bash
+pytest -q
+```
+
+## Notes
+
+- CuPy and PyFFTW are optional and auto-detected when installed.
+- v1 targets 1D simulations; APIs are structured for future 2D/3D and distributed execution.
