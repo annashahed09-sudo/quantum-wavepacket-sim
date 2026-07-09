@@ -1,3 +1,15 @@
 numpy
 scipy
 matplotlib
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+pydantic-settings
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+psutil
+email-validator
+httpx
+pytest
