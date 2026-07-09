@@ -70,8 +70,31 @@ src/
 ├── core/
 │   ├── wavefunction.py
 │   ├── potentials.py
-│
 ├── solvers/
 │   ├── split_operator.py
-│
+├── platform_hardening/
+│   ├── authorization.py
+│   ├── errors.py
+│   ├── models.py
+│   ├── policy.py
+│   ├── quota.py
+│   ├── service.py
+│   ├── validation.py
 ├── main.py
+tests/
+└── test_platform_hardening.py
+```
+
+---
+
+## Production Hardening Baseline
+
+This repository includes a server-side control layer in `src/platform_hardening/` that enforces:
+
+- Role checks for simulation execution (RBAC foundation)
+- Strict simulation request validation and bounded resource inputs
+- Per-user request and GPU-time quotas
+- Maximum concurrent jobs and execution timeout protection
+- Explicit server-side approval requirements for expensive simulation requests
+
+These controls are the first implementation phase of a broader production security and cost-control roadmap.
