@@ -1,77 +1,85 @@
-# Quantum Wave Packet Simulator (TDSE Engine)
+# Quantum Wavepacket Platform
 
-GPU-ready numerical solver for the Time-Dependent Schrödinger Equation using spectral methods to simulate quantum wave packet dynamics, tunneling, and scattering in one spatial dimension.
+Production-oriented quantum simulation platform with:
 
----
+- **Scientific simulation engine** (TDSE split-operator Fourier solver)
+- **FastAPI backend** with JWT authentication
+- **Persistent project and simulation storage** (SQLite via SQLAlchemy)
+- **Interactive desktop-first UI** with glassmorphism styling and live visualization canvas
+- **System and GPU monitor endpoint**
+- **Automated tests + CI workflow + Docker runtime**
 
-## Overview
-
-This project is a computational physics framework for solving the Time-Dependent Schrödinger Equation (TDSE). It simulates the evolution of quantum wave packets under external potentials, enabling visualization and analysis of tunneling, scattering, interference, and dispersion phenomena.
-
-The design is structured to evolve from a CPU-based numerical prototype into a GPU-accelerated and eventually multi-GPU distributed simulation system.
-
----
-
-## Key Computational Insight
-
-The dominant computational cost arises from FFT-based kinetic propagation in spectral space. This makes the solver memory-bandwidth bound and highly suitable for GPU acceleration using parallel FFT implementations.
-
----
-
-## Governing Equation
-
-The system solves the Time-Dependent Schrödinger Equation:
-
-iħ ∂ψ(x,t)/∂t = [−(ħ² / 2m) ∇² + V(x)] ψ(x,t)
-
-Where:
-- ψ(x,t): complex wavefunction
-- V(x): potential energy function
-- ħ: reduced Planck constant
-
-Observable quantity:
-- |ψ(x,t)|² → probability density
-
----
-
-## Numerical Method
-
-### Split-Operator Fourier Method
-
-The time evolution operator is approximated as:
-
-U(Δt) ≈ e^(−iVΔt/2ħ) · e^(−iTΔt/ħ) · e^(−iVΔt/2ħ)
-
-Where:
-- T is the kinetic energy operator
-- FFT is used to evaluate kinetic propagation in momentum space
-
-Properties:
-- Second-order accuracy in time
-- Approximately unitary (norm-preserving up to numerical precision)
-- Highly parallelizable and GPU-friendly
-
----
-
-## Physical Phenomena Simulated
-
-- Quantum tunneling through potential barriers
-- Wave packet scattering and reflection
-- Free particle dispersion
-- Quantum interference effects
-- Probability conservation dynamics
-
----
-
-## Project Architecture
+## Architecture
 
 ```text
 src/
-├── core/
-│   ├── wavefunction.py
-│   ├── potentials.py
-│
-├── solvers/
-│   ├── split_operator.py
-│
-├── main.py
+├── core/                          # physics primitives (wavefunction + potentials)
+├── solvers/                       # split-operator numerical solver
+├── main.py                        # uvicorn entrypoint
+└── quantum_platform/
+    ├── auth.py                    # password hashing + JWT handling
+    ├── config.py                  # environment configuration
+    ├── database.py                # SQLAlchemy engine/session
+    ├── models.py                  # ORM models (users, projects, runs)
+    ├── schemas.py                 # API contracts
+    ├── main.py                    # FastAPI app + API routes
+    ├── services/
+    │   └── simulation_service.py  # simulation execution service
+    └── static/
+        ├── index.html             # desktop app shell
+        ├── styles.css             # Apple-inspired glass UI styles
+        └── app.js                 # frontend behavior and API integration
+```
+
+## API Surface
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+- `POST /api/projects`
+- `GET /api/projects`
+- `PATCH /api/projects/{project_id}`
+- `DELETE /api/projects/{project_id}`
+- `POST /api/simulations/run`
+- `GET /api/simulations`
+- `GET /api/dashboard`
+- `GET /api/system/status`
+
+## Local Development
+
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Configure environment:
+   ```bash
+   cp .env.example .env
+   ```
+3. Run the app:
+   ```bash
+   PYTHONPATH=src python src/main.py
+   ```
+4. Open:
+   - UI: `http://localhost:8000`
+   - API Docs: `http://localhost:8000/docs`
+
+## Test
+
+```bash
+PYTHONPATH=src pytest -q
+```
+
+## Docker
+
+Build and run:
+
+```bash
+docker build -t quantum-wavepacket-platform .
+docker run --rm -p 8000:8000 quantum-wavepacket-platform
+```
+
+## Notes
+
+- The simulation engine is GPU-ready at the architecture level (monitoring endpoint included); numerical kernel runs on CPU in this implementation.
+- SQLite is default for local persistence. Use `DATABASE_URL` to switch to production databases.
+- Set a strong `JWT_SECRET_KEY` in production.

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantum Wavepacket Platform</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar glass">
+        <h1>Quantum Suite</h1>
+        <nav>
+          <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+          <button class="nav-btn" data-view="simulations">Simulations</button>
+          <button class="nav-btn" data-view="projects">Projects</button>
+          <button class="nav-btn" data-view="visualizations">Visualizations</button>
+          <button class="nav-btn" data-view="settings">Settings</button>
+        </nav>
+        <div class="status-block">
+          <h3>System Status</h3>
+          <p id="systemStatus">Loading...</p>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="toolbar glass">
+          <div class="toolbar-left">
+            <input id="globalSearch" placeholder="Search simulations, projects, docs" />
+          </div>
+          <div class="toolbar-right">
+            <button id="themeToggle">Toggle Theme</button>
+            <span id="autosaveStatus">All changes saved</span>
+          </div>
+        </header>
+
+        <section id="authPanel" class="panel glass">
+          <h2>Sign in</h2>
+          <div class="auth-grid">
+            <form id="registerForm">
+              <h3>Create account</h3>
+              <input required name="full_name" placeholder="Full name" />
+              <input required type="email" name="email" placeholder="Email" />
+              <input required type="password" name="password" placeholder="Password" minlength="8" />
+              <button type="submit">Register</button>
+            </form>
+            <form id="loginForm">
+              <h3>Log in</h3>
+              <input required type="email" name="email" placeholder="Email" />
+              <input required type="password" name="password" placeholder="Password" />
+              <button type="submit">Login</button>
+            </form>
+          </div>
+          <p id="authMessage"></p>
+        </section>
+
+        <section id="appPanel" class="hidden">
+          <div class="split-view">
+            <section class="panel glass left-panel">
+              <h2>Simulation Parameters</h2>
+              <form id="simulationForm" class="stack">
+                <input name="name" value="Barrier Scattering" required />
+                <input name="x_min" value="-50" type="number" step="0.1" />
+                <input name="x_max" value="50" type="number" step="0.1" />
+                <input name="grid_size" value="1024" type="number" min="128" max="8192" />
+                <input name="dt" value="0.01" type="number" step="0.001" />
+                <input name="steps" value="300" type="number" min="1" />
+                <input name="sample_stride" value="5" type="number" min="1" />
+                <input name="x0" value="-15" type="number" step="0.1" />
+                <input name="k0" value="6" type="number" step="0.1" />
+                <input name="sigma" value="1.5" type="number" step="0.1" />
+                <input name="barrier_height" value="1" type="number" step="0.1" />
+                <input name="barrier_width" value="3" type="number" step="0.1" />
+                <input name="barrier_center" value="0" type="number" step="0.1" />
+                <button type="submit">Run Simulation</button>
+              </form>
+            </section>
+
+            <section class="panel glass center-panel">
+              <h2>Visualization Canvas</h2>
+              <canvas id="simulationCanvas" width="1200" height="420"></canvas>
+              <div class="timeline-controls">
+                <input id="frameSlider" type="range" min="0" max="0" value="0" />
+                <span id="frameLabel">Frame 0</span>
+              </div>
+            </section>
+
+            <section class="panel glass right-panel">
+              <h2>Live Metrics</h2>
+              <ul id="metricsList"></ul>
+              <h3>Recent Simulations</h3>
+              <ul id="recentRuns"></ul>
+            </section>
+          </div>
+
+          <section class="bottom-dock glass">
+            <h3>Project Manager</h3>
+            <form id="projectForm" class="inline-form">
+              <input name="name" placeholder="Project name" required />
+              <input name="description" placeholder="Description" />
+              <button type="submit">Create Project</button>
+            </form>
+            <ul id="projectList"></ul>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div id="commandPalette" class="command-palette hidden glass">
+      <input id="commandInput" placeholder="Type a command" />
+      <ul>
+        <li data-command="theme">Toggle theme</li>
+        <li data-command="dashboard">Open dashboard</li>
+        <li data-command="simulations">Open simulations</li>
+      </ul>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
