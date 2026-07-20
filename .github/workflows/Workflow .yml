@@ -3,7 +3,7 @@ name: Scheduled Contribution Workflow
 on:
   schedule:
     # Runs exactly 12 times a day at specific UTC hours: 00:00, 05:00, 10:00, 15:00, 20:00
-    - cron: '0 0,15,16,17,18,19,20,21 * * *'
+    - cron: '0 0,15,16,17,18,19,20 * * *'
   workflow_dispatch: # Allows you to manually trigger the workflow from the Actions tab
 
 jobs:
