@@ -1,5 +1,11 @@
 # Quantum Wavepacket Platform
 
+[![CI](https://github.com/annashahed09-sudo/quantum-wavepacket-sim/actions/workflows/ci.yml/badge.svg)](https://github.com/annashahed09-sudo/quantum-wavepacket-sim/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+
+
 Production-oriented quantum simulation platform with:
 
 - **Scientific simulation engine** (TDSE split-operator Fourier solver)
@@ -31,6 +37,19 @@ src/
         └── app.js                 # frontend behavior and API integration
 ```
 
+
+## Potentials
+
+| Potential | Description | Parameters |
+|---|---|---|
+| `square_barrier` | Rectangular potential barrier | height, width, center |
+| `gaussian_barrier` | Smooth Gaussian barrier | height, sigma, center |
+| `harmonic_oscillator` | Quadratic trap | omega, mass, center |
+| `double_well` | Symmetric double well | height, width, barrier_width, center |
+| `finite_well` | Finite square well | depth, width, center |
+
+See `src/core/potentials.py` for full API documentation.
+
 ## API Surface
 
 - `POST /api/auth/register`
@@ -49,7 +68,7 @@ src/
 
 1. Install dependencies:
    ```bash
-   pip install -r requirements.txt
+   pip install -e ".[dev]"   # or:  pip install -r requirements.txt
    ```
 2. Configure environment:
    ```bash
@@ -68,6 +87,17 @@ src/
 ```bash
 PYTHONPATH=src pytest -q
 ```
+
+## Development
+
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Set up pre-commit hooks (optional but recommended)
+pre-commit install
+```
+
 
 ## Docker
 
